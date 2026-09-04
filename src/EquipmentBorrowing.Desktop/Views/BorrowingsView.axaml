@@ -1,0 +1,61 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:EquipmentBorrowing.Desktop.ViewModels"
+             xmlns:domain="using:EquipmentBorrowing.Domain.Entities"
+             x:Class="EquipmentBorrowing.Desktop.Views.BorrowingsView"
+             x:DataType="vm:BorrowingsViewModel">
+
+    <StackPanel Margin="20" Spacing="15">
+
+        <TextBlock Text="Active Borrowings"
+                   FontSize="24"
+                   FontWeight="Bold"/>
+
+        <TextBlock Text="Review current requests and return borrowed equipment."
+                   Foreground="{DynamicResource MutedTextBrush}"
+                   Margin="0,0,0,10"/>
+
+        <ItemsControl ItemsSource="{Binding ActiveBorrowings}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="domain:Borrowing">
+                    <Border Background="White"
+                            BorderBrush="#E2E8F0"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="16"
+                            Margin="0,0,0,10">
+
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel>
+                                <TextBlock Text="{Binding EquipmentId, StringFormat='Equipment: {0}'}"
+                                           Foreground="{DynamicResource PageTextBrush}"
+                                           FontWeight="SemiBold"
+                                           FontSize="16"/>
+
+                                <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,4,0,0">
+                                    <TextBlock Text="Student:" Foreground="{DynamicResource MutedTextBrush}" />
+                                    <TextBlock Text="{Binding StudentId}" Foreground="{DynamicResource PageTextBrush}" FontWeight="SemiBold" />
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,4,0,0">
+                                    <TextBlock Text="Status:" Foreground="{DynamicResource MutedTextBrush}" />
+                                    <TextBlock Text="{Binding Status}" Foreground="#166534" FontWeight="SemiBold" />
+                                </StackPanel>
+                            </StackPanel>
+
+                            <Button Grid.Column="1"
+                                    Content="Return Equipment"
+                                    Command="{Binding $parent[UserControl].((vm:BorrowingsViewModel)DataContext).ReturnEquipmentCommand}"
+                                    CommandParameter="{Binding}"
+                                    VerticalAlignment="Center"
+                                    Padding="12,8"
+                                    Background="#16A34A"
+                                    Foreground="White"/>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+    </StackPanel>
+</UserControl>

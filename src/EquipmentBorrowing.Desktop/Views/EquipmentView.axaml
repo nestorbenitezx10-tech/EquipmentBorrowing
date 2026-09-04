@@ -1,0 +1,32 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:EquipmentBorrowing.Desktop.ViewModels"
+             xmlns:domain="using:EquipmentBorrowing.Domain.Entities"
+             x:Class="EquipmentBorrowing.Desktop.Views.EquipmentView"
+             x:DataType="vm:EquipmentViewModel">
+    <StackPanel>
+        <TextBlock Classes="heading" Text="Equipment" />
+        <TextBlock Text="Available items for your next borrowing request."
+               Foreground="{DynamicResource MutedTextBrush}"
+                   Margin="0,0,0,18" />
+        <TextBlock Classes="section-label" Text="Student ID" />
+        <TextBox Classes="form-control" Text="{Binding StudentId}" />
+        <TextBlock Classes="section-label" Text="Borrowing days" />
+        <NumericUpDown Minimum="1" Maximum="30" Value="{Binding BorrowingDays}" MinHeight="36" />
+        <ItemsControl ItemsSource="{Binding Equipment}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="domain:Equipment">
+                    <Border Background="White" BorderBrush="#D9E2EC" BorderThickness="1" Padding="16" Margin="0,8,0,0">
+                        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                            <TextBlock Text="{Binding Name}" Foreground="{DynamicResource PageTextBrush}" FontWeight="SemiBold" FontSize="16" />
+                            <TextBlock Grid.Row="1" Text="{Binding AssetTag}" Foreground="{DynamicResource MutedTextBrush}" Margin="0,4,0,0" />
+                            <Button Grid.Column="1" Grid.RowSpan="2" Content="Borrow Equipment"
+                                    Command="{Binding $parent[UserControl].((vm:EquipmentViewModel)DataContext).BorrowEquipmentCommand}"
+                                    CommandParameter="{Binding}" IsEnabled="{Binding IsAvailable}" VerticalAlignment="Center" />
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </StackPanel>
+</UserControl>
