@@ -15,58 +15,49 @@ public class BorrowEquipmentService
         IBorrowingRepository borrowingRepository)
     {
         _studentRepository = studentRepository;
-        _equipmentRepository = equipmentRepository;
         _borrowingRepository = borrowingRepository;
+        _equipmentRepository = equipmentRepository;
     }
 
-    public async Task<Borrowing> RequestBorrowingAsync(string studentId, string equipmentId, int durationDays)
+    public async Task<Borrowing> RequestBorrowingAsync(
+        string studentId,
+        string equipmentId,
+        int borrowingDays)
     {
         var student = await _studentRepository.GetByIdAsync(studentId);
-        if (student == null || !student.IsActive)
-        {
-            throw new InvalidOperationException("Student is invalid or inactive.");
-        }
+        if (student is null || !student.IsActive)
+            throw new InvalidOperationException("Student is not found or inactive.");
 
         var equipment = await _equipmentRepository.GetByIdAsync(equipmentId);
-        if (equipment == null || !equipment.IsAvailable)
-        {
-            throw new InvalidOperationException("Equipment is invalid or unavailable.");
-        }
-
-        var activeBorrowings = await _borrowingRepository.GetActiveBorrowingsByStudentIdAsync(studentId);
-        if (activeBorrowings.Count() >= 3)
-        {
-            throw new InvalidOperationException("Student has reached the maximum limit of 3 concurrent items.");
-        }
+        if (equipment is null || !equipment.IsAvailable)
+            throw new InvalidOperationException("Equipment is not found or unavailable.");
 
         var borrowing = new Borrowing
         {
             StudentId = studentId,
             EquipmentId = equipmentId,
-            ExpectedReturnDate = DateTime.UtcNow.AddDays(durationDays),
+            ExpectedReturnDate = DateTime.UtcNow.AddDays(borrowingDays),
             Status = BorrowingStatus.Requested
         };
 
         await _borrowingRepository.SaveAsync(borrowing);
+        equipment.IsAvailable = false;
+        await _equipmentRepository.UpdateAsync(equipment);
+
         return borrowing;
     }
 
     public async Task ConfirmPickupAsync(string borrowingId)
     {
         var borrowing = await _borrowingRepository.GetByIdAsync(borrowingId);
-        if (borrowing == null || borrowing.Status != BorrowingStatus.Requested)
-        {
-            throw new InvalidOperationException("Borrowing request is not in a valid state for pickup.");
-        }
+        if (borrowing is null)
+            throw new InvalidOperationException("Borrowing record not found.");
 
-        var equipment = await _equipmentRepository.GetByIdAsync(borrowing.EquipmentId);
-        if (equipment == null) throw new InvalidOperationException("Equipment not found.");
+        if (borrowing.Status != BorrowingStatus.Requested)
+            throw new InvalidOperationException("Only requested borrowings can be picked up.");
 
-        equipment.IsAvailable = false;
-        borrowing.BorrowedDate = DateTime.UtcNow;
         borrowing.Status = BorrowingStatus.Borrowed;
-
-        await _equipmentRepository.UpdateAsync(equipment);
+        borrowing.BorrowedDate = DateTime.UtcNow;
         await _borrowingRepository.UpdateAsync(borrowing);
     }
 }

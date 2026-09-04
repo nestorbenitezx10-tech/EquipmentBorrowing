@@ -102,3 +102,4 @@ C:\Users\NESTOR BENITEZ\EquipmentBorrowing\EquipmentBorrowing\tests\EquipmentBor
 C:\Users\NESTOR BENITEZ\EquipmentBorrowing\EquipmentBorrowing\tests\EquipmentBorrowing.Tests\obj\Debug\net10.0\EquipmentBorrowing.Tests.pdb
 C:\Users\NESTOR BENITEZ\EquipmentBorrowing\EquipmentBorrowing\tests\EquipmentBorrowing.Tests\obj\Debug\net10.0\EquipmentBorrowing.Tests.genruntimeconfig.cache
 C:\Users\NESTOR BENITEZ\EquipmentBorrowing\EquipmentBorrowing\tests\EquipmentBorrowing.Tests\obj\Debug\net10.0\ref\EquipmentBorrowing.Tests.dll
+C:\Users\NESTOR BENITEZ\EquipmentBorrowing\EquipmentBorrowing\tests\EquipmentBorrowing.Tests\obj\Debug\net10.0\EquipmentBorrowing.Tests.sourcelink.json

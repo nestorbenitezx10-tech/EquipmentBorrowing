@@ -9,3 +9,10 @@ C:\Users\NESTOR BENITEZ\EquipmentBorrowing\EquipmentBorrowing\src\EquipmentBorro
 C:\Users\NESTOR BENITEZ\EquipmentBorrowing\EquipmentBorrowing\src\EquipmentBorrowing.Domain\obj\Debug\net10.0\refint\EquipmentBorrowing.Domain.dll
 C:\Users\NESTOR BENITEZ\EquipmentBorrowing\EquipmentBorrowing\src\EquipmentBorrowing.Domain\obj\Debug\net10.0\EquipmentBorrowing.Domain.pdb
 C:\Users\NESTOR BENITEZ\EquipmentBorrowing\EquipmentBorrowing\src\EquipmentBorrowing.Domain\obj\Debug\net10.0\ref\EquipmentBorrowing.Domain.dll
+C:\Users\NESTOR BENITEZ\EquipmentBorrowing\EquipmentBorrowing\src\EquipmentBorrowing.Domain\obj\Debug\net10.0\EquipmentBorrowing.Domain.sourcelink.json
+C:\Users\NESTOR BENITEZ\EquipmentBorrowing\EquipmentBorrowing\build-validation\Desktop\EquipmentBorrowing.Domain.deps.json
+C:\Users\NESTOR BENITEZ\EquipmentBorrowing\EquipmentBorrowing\build-validation\Desktop\EquipmentBorrowing.Domain.dll
+C:\Users\NESTOR BENITEZ\EquipmentBorrowing\EquipmentBorrowing\build-validation\Desktop\EquipmentBorrowing.Domain.pdb
+C:\Users\NESTOR BENITEZ\EquipmentBorrowing\EquipmentBorrowing\build-validation\Desktop-Contrast\EquipmentBorrowing.Domain.deps.json
+C:\Users\NESTOR BENITEZ\EquipmentBorrowing\EquipmentBorrowing\build-validation\Desktop-Contrast\EquipmentBorrowing.Domain.dll
+C:\Users\NESTOR BENITEZ\EquipmentBorrowing\EquipmentBorrowing\build-validation\Desktop-Contrast\EquipmentBorrowing.Domain.pdb

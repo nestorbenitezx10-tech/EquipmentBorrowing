@@ -15,10 +15,12 @@ public class InMemoryBorrowingRepository : IBorrowingRepository
 
     public Task<IEnumerable<Borrowing>> GetActiveBorrowingsByStudentIdAsync(string studentId)
     {
-        var active = _borrowings.Values.Where(b => 
-            b.StudentId == studentId && 
-            (b.Status == BorrowingStatus.Requested || b.Status == BorrowingStatus.Borrowed || b.Status == BorrowingStatus.Approved));
-        
+        var active = _borrowings.Values.Where(b =>
+            b.StudentId == studentId &&
+            (b.Status == BorrowingStatus.Requested ||
+             b.Status == BorrowingStatus.Borrowed ||
+             b.Status == BorrowingStatus.Approved));
+
         return Task.FromResult(active);
     }
 
@@ -32,5 +34,16 @@ public class InMemoryBorrowingRepository : IBorrowingRepository
     {
         _borrowings[borrowing.Id] = borrowing;
         return Task.CompletedTask;
+    }
+
+    // Added for Lab 2
+    public Task<IEnumerable<Borrowing>> GetActiveBorrowingsAsync(CancellationToken cancellationToken = default)
+    {
+        var active = _borrowings.Values.Where(b =>
+            b.Status == BorrowingStatus.Requested ||
+            b.Status == BorrowingStatus.Borrowed ||
+            b.Status == BorrowingStatus.Approved);
+
+        return Task.FromResult(active.AsEnumerable());
     }
 }

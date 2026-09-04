@@ -13,6 +13,11 @@ public class InMemoryEquipmentRepository : IEquipmentRepository
         return Task.FromResult(equipment);
     }
 
+    public Task<IEnumerable<Equipment>> GetAllAsync()
+    {
+        return Task.FromResult<IEnumerable<Equipment>>(_equipmentMap.Values.ToList());
+    }
+
     public Task SaveAsync(Equipment equipment)
     {
         _equipmentMap[equipment.Id] = equipment;
