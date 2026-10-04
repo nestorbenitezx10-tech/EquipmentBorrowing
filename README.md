@@ -1,260 +1,85 @@
 # Campus Equipment Borrowing System
 
-**ITSD 81 – Desktop Application Development**  
-**Laboratory Activity 1: From Requirements to Application Structure**
+ITSD 81 – Desktop Application Development
 
-This solution provides the architectural foundation for a Campus Equipment Borrowing System.  
-It focuses on clean separation of concerns, domain modeling, repository abstractions, and application services — without any user interface or database yet.
+An Avalonia desktop application for browsing campus equipment, requesting borrowings, and recording returns. Entity Framework Core and SQLite provide persistent storage.
 
----
+Repository: https://github.com/nestorbenitezx10-tech/EquipmentBorrowing
 
-## 1. Solution Structure
+## Solution structure
 
-The solution follows a layered architecture:
+| Project | Responsibility |
+| --- | --- |
+| src/EquipmentBorrowing.Domain | Student, Equipment, Borrowing, and status types. |
+| src/EquipmentBorrowing.Application | Use cases and repository interfaces. |
+| src/EquipmentBorrowing.Infrastructure | EF Core SQLite context, configurations, migrations, and repositories. |
+| src/EquipmentBorrowing.Desktop | Avalonia UI, view models, and app startup. |
+| tests/EquipmentBorrowing.Tests | Automated tests. |
 
-| Project | Purpose |
-|---------|---------|
-| **EquipmentBorrowing.Domain** | Contains the core business concepts and rules of the problem domain. It has no dependencies on other projects. |
-| **EquipmentBorrowing.Application** | Contains application services (use cases) and repository interfaces. It coordinates domain objects and defines what the system can do. |
-| **EquipmentBorrowing.Infrastructure** | Contains concrete implementations of the repository interfaces (currently in-memory). This layer handles technical details. |
-| **EquipmentBorrowing.Tests** | Contains automated tests for domain and application behavior. |
-| **EquipmentBorrowing.Demo** | A simple console application used to demonstrate successful and failed borrowing scenarios. |
+## Build, test, and run
 
-This separation ensures that business rules remain independent of UI technology and data storage technology.
+Run commands from the repository root with the .NET 8 SDK. Explicit project commands work on SDKs that do not support the .slnx solution format.
 
----
+    dotnet restore src\EquipmentBorrowing.Desktop\EquipmentBorrowing.Desktop.csproj
+    dotnet build src\EquipmentBorrowing.Desktop\EquipmentBorrowing.Desktop.csproj --configuration Release
+    dotnet test tests\EquipmentBorrowing.Tests\EquipmentBorrowing.Tests.csproj --configuration Release
+    dotnet run --project src\EquipmentBorrowing.Desktop\EquipmentBorrowing.Desktop.csproj --configuration Release
 
-## 2. Dependency Direction
+Start the desktop app from the repository root. It applies pending EF Core migrations and uses equipment_borrowing.db in the current working directory. If the Equipment table is empty, it seeds students STU-001, STU-002, STU-999 (inactive) and equipment EQ-101, EQ-102, EQ-103.
 
-The dependency flow is designed so that inner layers do not know about outer layers:
+### Borrow equipment
 
-**Explanation:**
-- `Application` depends only on `Domain`.
-- `Infrastructure` depends on both `Domain` and `Application`.
-- The Demo / future UI depends on `Application` and `Infrastructure`.
-- `Domain` has **zero** dependencies on other projects.
+1. Open Equipment.
+2. Enter an active student ID, such as STU-001, and the borrowing duration.
+3. Select an available equipment row.
+4. Click Borrow selected equipment.
+5. Open Active Borrowings to view the saved request.
 
-This follows the Dependency Inversion Principle.
+### Return equipment
 
----
+1. Open Active Borrowings.
+2. Select the borrowing row and click Return selected borrowing.
+3. Confirm the success message and that the equipment is available again.
 
-## 3. Use Case Mapping
+To verify persistence, close and restart the app from the same directory. Check Active Borrowings and the SQLite Borrowings table.
 
-**Actor:** Student  
+## SQLite and EF Core
 
-**Use Case:** Borrow Equipment  
+- Provider project: src/EquipmentBorrowing.Infrastructure/EquipmentBorrowing.Infrastructure.csproj
+- DbContext: src/EquipmentBorrowing.Infrastructure/Persistence/EquipmentBorrowingDbContext.cs
+- Entity configurations: src/EquipmentBorrowing.Infrastructure/Persistence/Configuration/
+- Design-time factory: src/EquipmentBorrowing.Infrastructure/Persistence/DbContextFactory.cs
+- Initial migration and model snapshot: src/EquipmentBorrowing.Infrastructure/Persistence/Migrations/
+- Database-backed repositories: src/EquipmentBorrowing.Infrastructure/Repositories/
+- SQL statements: docs/database-queries.sql
+- Logical relational diagram: docs/database-schema.md
 
-**Application Service:** `BorrowEquipmentService`  
+Tables include Students, Equipment, Borrowings, and EF Core's __EFMigrationsHistory. Borrowing status is an integer enum: Requested=0, Approved=1, Borrowed=2, Returned=3, Overdue=4. The current migration does not enforce foreign-key constraints between borrowing IDs and the other tables.
 
-**Domain Objects Used:**
-- `Student`
-- `Equipment`
-- `Borrowing`
-- `BorrowingStatus`
+The SQL file includes an example UPDATE that marks EQ-101 unavailable. Run it only if that change is intended.
 
-**Repository Interfaces Used:**
-- `IStudentRepository`
-- `IEquipmentRepository`
-- `IBorrowingRepository`
+## Laboratory Activity 3 submission checklist
 
-**Infrastructure Implementations Used:**
-- `InMemoryStudentRepository`
-- `InMemoryEquipmentRepository`
-- `InMemoryBorrowingRepository`
+| # | Requirement | Artifact or evidence |
+|---|---|---|
+| 1 | Link or compressed copy of complete Git repository | This repository or a ZIP copy. |
+| 2 | Complete .NET solution that builds successfully | EquipmentBorrowing.slnx; capture successful Release build output. |
+| 3 | SQLite database using EF Core | Provider, DbContext, migrations, and repositories in Infrastructure. |
+| 4 | Relational database diagram | docs/database-schema.md; logical relationships, no enforced foreign keys in current migration. |
+| 5 | Required SQL statements | docs/database-queries.sql. |
+| 6 | EF Core DbContext and entity configurations | DbContext and Persistence/Configuration/. |
+| 7 | Initial EF Core migration | Persistence/Migrations/ with initial migration and model snapshot. |
+| 8 | Database-backed repositories | EF repository implementations under Infrastructure/Repositories/. |
+| 9 | Working Avalonia application with persistent data | Desktop project; capture borrow, restart persistence, and return workflows. |
+| 10 | Updated README | This file. |
+| 11 | Screenshot of database tables | Capture SQLite viewer showing Students, Equipment, and Borrowings. |
+| 12 | Screenshot of stored Student, Equipment, and Borrowing data | Capture actual rows in the SQLite viewer. |
+| 13 | Borrow, restart, and return screenshots | Capture successful app operations and matching database records. |
+| 14 | Two inspected EF Core generated SQL queries | Capture actual EF Core SQL logging output; the SQL file alone is not proof. |
+| 15 | Successful build and Git history | Capture successful build output and actual repository history. |
 
----
+Capture genuine screenshots from the running application, SQLite viewer, build output, and EF Core logs. Do not claim evidence that has not been captured and verified. Do not publish a database containing personal or sensitive information.
 
-## 4. Reflection
+## Architecture
 
-1. **Why should the application service depend on a repository interface instead of directly depending on a database implementation?**  
-   Depending on an interface keeps the application layer independent of any specific storage technology. This makes the system easier to test, maintain, and change later without modifying the business logic.
-
-2. **Which parts of your current solution could remain unchanged if SQLite were added later?**  
-   The Domain project, the Application project, and the Demo project would remain unchanged. Only a new repository implementation would be added in the Infrastructure project.
-
-3. **Which project would eventually contain Avalonia Views?**  
-   A new project (for example `EquipmentBorrowing.UI`) would contain the Avalonia Views.
-
-4. **Should an Avalonia button directly execute database queries? Why or why not?**  
-   No. An Avalonia button should only call an application service. Doing database queries directly from the UI would violate separation of concerns.
-
-5. **What part of your implementation represents the actual business operation requested by the actor?**  
-   The `BorrowEquipmentService` represents the actual business operation requested by the student.
-
----
-
-## How to Run the Demonstration
-
-```bash
-dotnet build
-dotnet run --project src/EquipmentBorrowing.Demo
-```
-
-## Part L: Updated README
-
-### 1. Desktop Project
-
-`EquipmentBorrowing.Desktop` is the Avalonia desktop application. It provides the
-views, navigation, user input, and feedback for the equipment borrowing workflow.
-`App.axaml.cs` is the composition point: it creates the in-memory repositories,
-seeds sample data, and injects those repositories into `MainWindowViewModel`.
-
-The desktop project references `EquipmentBorrowing.Application` for use-case
-services and `EquipmentBorrowing.Infrastructure` for the in-memory repository
-implementations. It does not access repository implementations from the view.
-
-### 2. Updated Architecture
-
-```text
-Avalonia View
-      |
-      | Binding / Command
-      v
-ViewModel
-      |
-      | Application Operation
-      v
-Application Service
-      |
-      +----------> Domain
-      |
-      v
-Repository Interface
-      ^
-      |
-Infrastructure Implementation
-```
-
-The main window switches between the Equipment and Active Borrowings sections
-through view-model state. Observable collections are refreshed after borrowing
-or returning equipment, so both sections show the current application state.
-
-### 3. Borrow Equipment Flow
-
-1. The user enters a student ID and borrowing duration, then selects Borrow Equipment.
-2. The Equipment view command calls `EquipmentViewModel.BorrowEquipmentAsync`.
-3. The equipment view model calls `BorrowEquipmentService.RequestBorrowingAsync`.
-4. The application service validates the student and equipment, creates a requested
-   `Borrowing`, saves it, and marks the equipment unavailable.
-5. The view model refreshes both collections and displays a success or error message.
-
-### 4. Return Equipment Flow
-
-1. The user opens Active Borrowings and selects Return Equipment.
-2. The Borrowings view command calls `BorrowingsViewModel.ReturnEquipmentAsync`.
-3. The borrowings view model calls `ReturnEquipmentService.ReturnAsync`.
-4. The application service marks the borrowing returned and makes its equipment
-   available again through the repository interfaces.
-5. The view model refreshes the equipment and active-borrowing lists and displays
-   the operation result.
-
-### 5. Architectural Reflection
-
-1. **Why should the View not call a repository directly?**  The View should only
-   handle presentation and user interaction. Calling a repository directly would
-   couple the UI to storage details and bypass application business rules.
-2. **Why should business rules not be implemented in the ViewModel?**  Business
-   rules belong in the application or domain layers so they can be reused and
-   tested without an Avalonia UI.
-3. **What is the responsibility of the ViewModel?**  It exposes presentation state,
-   accepts commands from the View, invokes application services, and refreshes
-   the data displayed by the View.
-4. **Why can the existing Application layer work without knowing that Avalonia is
-   being used?**  It depends on domain entities and repository interfaces, not on
-   UI controls or Avalonia types.
-5. **What advantage is gained from registering dependencies in one composition
-   point?**  Object creation and wiring are centralized, making dependencies
-   explicit and making it easier to replace implementations later.
-6. **If the in-memory repository were replaced by SQLite later, which parts of the
-   current interface should remain largely unchanged?**  The View, ViewModel,
-   application services, domain entities, and repository interfaces should remain
-   largely unchanged. Only the infrastructure implementations and composition
-   registration would need to change.
-
----
-
-# Laboratory Activity 2 – Avalonia UI and MVVM
-
-## 1. Desktop Project
-
-The `EquipmentBorrowing.Desktop` project is responsible for the presentation layer of the system.  
-It contains:
-
-- Avalonia Views (XAML)
-- ViewModels
-- Application startup and Dependency Injection configuration
-
-This project interacts with the existing layers as follows:
-
-- It references `EquipmentBorrowing.Application` to use the application services (`BorrowEquipmentService` and `ReturnEquipmentService`).
-- It references `EquipmentBorrowing.Infrastructure` to register the in-memory repositories.
-- It does **not** contain any business rules or domain logic.
-
----
-
-## 2. Updated Architecture
-Avalonia View (XAML)
-│
-│ Binding / Command
-▼
-ViewModel (CommunityToolkit.Mvvm)
-│
-│ Application Operation
-▼
-Application Service
-│
-├──────────► Domain
-│
-▼
-Repository Interface
-▲
-│
-Infrastructure Implementation (In-Memory)
-text---
-
-## 3. Borrow Equipment Flow
-
-1. User selects equipment and enters Student ID in the **Equipment** view.
-2. User clicks the **Borrow Equipment** button.
-3. The button triggers a `RelayCommand` in `EquipmentViewModel`.
-4. The ViewModel calls `BorrowEquipmentService`.
-5. The Application Service validates the request using Domain rules and repositories.
-6. The result (success or failure message) is returned to the ViewModel.
-7. The ViewModel updates the `StatusMessage` property.
-8. The View displays the message to the user through data binding.
-
----
-
-## 4. Return Equipment Flow
-
-1. User navigates to the **Active Borrowings** view.
-2. User clicks the **Return Equipment** button on a specific borrowing.
-3. The button triggers the `ReturnCommand` in `BorrowingsViewModel`.
-4. The ViewModel calls `ReturnEquipmentService`.
-5. The service updates the borrowing status and makes the equipment available again.
-6. The result is returned to the ViewModel.
-7. The list of active borrowings is refreshed.
-8. The success or failure message is shown to the user.
-
----
-
-## 5. Architectural Reflection
-
-1. **Why should the View not call a repository directly?**  
-   Because the View should only handle presentation. Calling a repository directly would break separation of concerns and make the UI dependent on data access technology.
-
-2. **Why should business rules not be implemented in the ViewModel?**  
-   Business rules belong to the Domain or Application layer. Putting them in the ViewModel would make the rules harder to reuse and test, and would mix presentation logic with business logic.
-
-3. **What is the responsibility of the ViewModel?**  
-   The ViewModel is responsible for presentation state, user input, commands, and calling application services. It acts as a bridge between the View and the Application layer.
-
-4. **Why can the existing Application layer work without knowing that Avalonia is being used?**  
-   Because the Application layer only depends on Domain and repository interfaces. It has no reference to Avalonia, so it remains independent of the UI technology.
-
-5. **What advantage is gained from registering dependencies in one composition point?**  
-   It makes the dependency graph clear and centralized. Changing implementations (for example, replacing in-memory repositories later) can be done in one place without modifying ViewModels or services.
-
-6. **If the in-memory repository were replaced by SQLite later, which parts of the current interface should remain largely unchanged?**  
-   The Views, ViewModels, Application Services, and Domain models should remain largely unchanged. Only a new rep
-   
+Avalonia View → ViewModel → Application service → Repository interface → EF Core repository → EquipmentBorrowingDbContext → SQLite
