@@ -4,29 +4,85 @@
              xmlns:domain="using:EquipmentBorrowing.Domain.Entities"
              x:Class="EquipmentBorrowing.Desktop.Views.EquipmentView"
              x:DataType="vm:EquipmentViewModel">
-    <StackPanel>
-        <TextBlock Classes="heading" Text="Equipment" />
-        <TextBlock Text="Available items for your next borrowing request."
-               Foreground="{DynamicResource MutedTextBrush}"
-                   Margin="0,0,0,18" />
-        <TextBlock Classes="section-label" Text="Student ID" />
-        <TextBox Classes="form-control" Text="{Binding StudentId}" />
-        <TextBlock Classes="section-label" Text="Borrowing days" />
-        <NumericUpDown Minimum="1" Maximum="30" Value="{Binding BorrowingDays}" MinHeight="36" />
-        <ItemsControl ItemsSource="{Binding Equipment}">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate x:DataType="domain:Equipment">
-                    <Border Background="White" BorderBrush="#D9E2EC" BorderThickness="1" Padding="16" Margin="0,8,0,0">
-                        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
-                            <TextBlock Text="{Binding Name}" Foreground="{DynamicResource PageTextBrush}" FontWeight="SemiBold" FontSize="16" />
-                            <TextBlock Grid.Row="1" Text="{Binding AssetTag}" Foreground="{DynamicResource MutedTextBrush}" Margin="0,4,0,0" />
-                            <Button Grid.Column="1" Grid.RowSpan="2" Content="Borrow Equipment"
-                                    Command="{Binding $parent[UserControl].((vm:EquipmentViewModel)DataContext).BorrowEquipmentCommand}"
-                                    CommandParameter="{Binding}" IsEnabled="{Binding IsAvailable}" VerticalAlignment="Center" />
-                        </Grid>
-                    </Border>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+    <StackPanel Spacing="12">
+        <TextBlock Classes="heading" Text="Equipment catalog"/>
+        <TextBlock Text="Select an item to edit it, view its history, or check it out."/>
+        <TextBlock Text="{Binding LoadMessage}" TextWrapping="Wrap"/>
+        <WrapPanel>
+            <Button Content="Show all equipment" Command="{Binding ShowAllEquipmentCommand}"/>
+            <Button Content="Available only" Command="{Binding ShowAvailableEquipmentCommand}"/>
+            <Button Content="Refresh catalog" Command="{Binding RetryLoadCommand}"/>
+        </WrapPanel>
+        <DataGrid Height="250"
+                  ItemsSource="{Binding EquipmentList}"
+                  SelectedItem="{Binding SelectedEquipment}"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  GridLinesVisibility="All">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Identifier" Binding="{Binding Identifier}" Width="150"/>
+                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="220"/>
+                <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*"/>
+                <DataGridCheckBoxColumn Header="Available" Binding="{Binding IsAvailable}" IsReadOnly="True" Width="100"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <TextBlock Classes="section-label" Text="Single-item checkout"/>
+        <WrapPanel>
+            <ComboBox Width="280"
+                      ItemsSource="{Binding Students}"
+                      SelectedItem="{Binding SelectedStudent}"
+                      PlaceholderText="Select student">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate x:DataType="domain:Student">
+                        <TextBlock>
+                            <Run Text="{Binding StudentNumber}"/>
+                            <Run Text=" — "/>
+                            <Run Text="{Binding FullName}"/>
+                        </TextBlock>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <DatePicker SelectedDate="{Binding ExpectedReturnDate}"/>
+            <Button Content="Borrow selected equipment"
+                    Command="{Binding BorrowSelectedEquipmentCommand}"/>
+        </WrapPanel>
+
+        <TextBlock Classes="section-label" Text="Register equipment"/>
+        <WrapPanel>
+            <TextBox Classes="form-control" Width="150" MaxLength="50"
+                     Watermark="Equipment ID" Text="{Binding NewIdentifier}"/>
+            <TextBox Classes="form-control" Width="200" MaxLength="150"
+                     Watermark="Name" Text="{Binding NewName}"/>
+            <TextBox Classes="form-control" Width="240" MaxLength="500"
+                     Watermark="Description (optional)" Text="{Binding NewDescription}"/>
+            <Button Content="Register" Command="{Binding RegisterEquipmentCommand}"/>
+        </WrapPanel>
+
+        <TextBlock Classes="section-label" Text="Edit selected equipment"/>
+        <WrapPanel>
+            <TextBox Classes="form-control" Width="150" MaxLength="50"
+                     Watermark="Equipment ID" Text="{Binding EditIdentifier}"/>
+            <TextBox Classes="form-control" Width="200" MaxLength="150"
+                     Watermark="Name" Text="{Binding EditName}"/>
+            <TextBox Classes="form-control" Width="240" MaxLength="500"
+                     Watermark="Description (optional)" Text="{Binding EditDescription}"/>
+            <Button Content="Save details" Command="{Binding UpdateEquipmentCommand}"/>
+            <Button Content="View item history" Command="{Binding LoadEquipmentHistoryCommand}"/>
+        </WrapPanel>
+        <TextBlock Text="Availability and borrowing history are changed only by checkout and return workflows."/>
+        <DataGrid Height="150"
+                  ItemsSource="{Binding EquipmentHistory}"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  GridLinesVisibility="All">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Student" Binding="{Binding Student.StudentNumber}" Width="130"/>
+                <DataGridTextColumn Header="Checkout" Binding="{Binding CheckoutDate}" Width="130"/>
+                <DataGridTextColumn Header="Expected return" Binding="{Binding ExpectedReturnDate}" Width="160"/>
+                <DataGridTextColumn Header="Returned" Binding="{Binding ActualReturnDate}" Width="130"/>
+                <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="100"/>
+            </DataGrid.Columns>
+        </DataGrid>
     </StackPanel>
 </UserControl>
