@@ -1,0 +1,113 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:EquipmentBorrowing.Desktop.ViewModels"
+             x:Class="EquipmentBorrowing.Desktop.Views.BorrowingsView"
+             x:DataType="vm:BorrowingsViewModel">
+    <StackPanel Spacing="18">
+        <TextBlock Text="Borrowing Transactions and Multi-Item Checkout" FontSize="18" FontWeight="Bold"/>
+
+        <Border Padding="14" CornerRadius="6" Background="#F4F7FA" BorderBrush="#D0D7DE" BorderThickness="1">
+            <StackPanel Spacing="10">
+                <TextBlock Text="Multi-Item Checkout (Select Student + At Least 2 Available Items)" FontWeight="SemiBold"/>
+                <WrapPanel Orientation="Horizontal">
+                    <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,14,8">
+                        <TextBlock Text="Student" VerticalAlignment="Center"/>
+                        <ComboBox Width="240"
+                                  ItemsSource="{Binding Students}"
+                                  SelectedItem="{Binding SelectedCheckoutStudent}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding FullName}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,14,8">
+                        <TextBlock Text="Expected Return" VerticalAlignment="Center"/>
+                        <DatePicker SelectedDate="{Binding ExpectedReturnDateOffset}"/>
+                    </StackPanel>
+                </WrapPanel>
+
+                <TextBlock Text="Available Equipment (Hold Ctrl/Shift or click to select multiple)" FontSize="12"/>
+                <ListBox x:Name="AvailableEquipmentListBox"
+                         Height="130"
+                         SelectionMode="Multiple"
+                         ItemsSource="{Binding AvailableEquipment}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock>
+                                <Run Text="{Binding Identifier}"/>
+                                <Run Text=" — "/>
+                                <Run Text="{Binding Name}"/>
+                            </TextBlock>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <WrapPanel Orientation="Horizontal">
+                    <Button Content="Checkout Selected Items (2+)"
+                            Command="{Binding CheckoutSelectedItemsCommand}"
+                            CommandParameter="{Binding #AvailableEquipmentListBox.SelectedItems}"
+                            Margin="0,0,8,4"/>
+                    <Button Content="Return Selected Borrowing"
+                            Command="{Binding ReturnSelectedEquipmentCommand}"
+                            Margin="0,0,8,4"/>
+                </WrapPanel>
+            </StackPanel>
+        </Border>
+
+        <Border Padding="14" CornerRadius="6" Background="#F9FBFD" BorderBrush="#D0D7DE" BorderThickness="1">
+            <StackPanel Spacing="10">
+                <TextBlock Text="Search, Filter, and Sort Borrowings" FontWeight="SemiBold"/>
+                <WrapPanel Orientation="Horizontal">
+                    <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,12,8">
+                        <TextBlock Text="Search" VerticalAlignment="Center"/>
+                        <TextBox Width="180"
+                                 Watermark="Student, ID, or item"
+                                 Text="{Binding SearchText}"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,12,8">
+                        <TextBlock Text="Status" VerticalAlignment="Center"/>
+                        <ComboBox Width="130"
+                                  ItemsSource="{Binding StatusFilters}"
+                                  SelectedItem="{Binding SelectedStatusFilter}"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,12,8">
+                        <TextBlock Text="Sort By" VerticalAlignment="Center"/>
+                        <ComboBox Width="165"
+                                  ItemsSource="{Binding SortFields}"
+                                  SelectedItem="{Binding SelectedSortField}"/>
+                    </StackPanel>
+
+                    <CheckBox Content="Ascending"
+                              IsChecked="{Binding SortAscending}"
+                              VerticalAlignment="Center"
+                              Margin="0,0,12,8"/>
+
+                    <Button Content="Search"
+                            Command="{Binding ApplySearchOrFilterCommand}"
+                            Margin="0,0,8,8"/>
+                    <Button Content="Clear"
+                            Command="{Binding ClearFiltersCommand}"
+                            Margin="0,0,8,8"/>
+                </WrapPanel>
+            </StackPanel>
+        </Border>
+
+        <StackPanel Spacing="6">
+            <TextBlock Text="Loading borrowings..." IsVisible="{Binding IsLoading}" FontStyle="Italic"/>
+            <TextBlock Text="{Binding ListStatusMessage}"
+                       IsVisible="{Binding ListStatusMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                       TextWrapping="Wrap"/>
+            <DataGrid Height="260"
+                      ItemsSource="{Binding Borrowings}"
+                      SelectedItem="{Binding SelectedBorrowing}"
+                      AutoGenerateColumns="True"
+                      IsReadOnly="True"
+                      GridLinesVisibility="All"/>
+        </StackPanel>
+    </StackPanel>
+</UserControl>

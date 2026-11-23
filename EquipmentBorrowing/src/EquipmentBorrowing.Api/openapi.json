@@ -1,0 +1,967 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Campus Equipment Borrowing API",
+    "version": "1.0.0",
+    "description": "Activity 5 REST contract. All routes use JSON and the /api/v1 prefix."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5090"
+    }
+  ],
+  "paths": {
+    "/api/v1/equipment": {
+      "get": {
+        "operationId": "listEquipment",
+        "parameters": [
+          {
+            "name": "available",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Equipment array",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Equipment"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          },
+          "405": {
+            "description": "The HTTP method is not supported for this route."
+          }
+        }
+      },
+      "post": {
+        "operationId": "createEquipment",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/EquipmentInput"
+        },
+        "responses": {
+          "201": {
+            "description": "Created equipment; Location points to API-07",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Equipment"
+                }
+              }
+            },
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          },
+          "405": {
+            "description": "The HTTP method is not supported for this route."
+          }
+        }
+      }
+    },
+    "/api/v1/students": {
+      "get": {
+        "operationId": "listStudents",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Student array",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Student"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          },
+          "405": {
+            "description": "The HTTP method is not supported for this route."
+          }
+        }
+      },
+      "post": {
+        "operationId": "createStudent",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/StudentInput"
+        },
+        "responses": {
+          "201": {
+            "description": "Created student; Location points to API-03",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Student"
+                }
+              }
+            },
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          },
+          "405": {
+            "description": "The HTTP method is not supported for this route."
+          }
+        }
+      }
+    },
+    "/api/v1/students/{id}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/id"
+        }
+      ],
+      "get": {
+        "operationId": "getStudent",
+        "responses": {
+          "200": {
+            "description": "Student",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Student"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          },
+          "405": {
+            "description": "The HTTP method is not supported for this route."
+          }
+        }
+      },
+      "put": {
+        "operationId": "updateStudent",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/StudentInput"
+        },
+        "responses": {
+          "200": {
+            "description": "Updated student",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Student"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          },
+          "405": {
+            "description": "The HTTP method is not supported for this route."
+          }
+        }
+      }
+    },
+    "/api/v1/students/{id}/eligibility": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/id"
+        }
+      ],
+      "patch": {
+        "operationId": "setStudentEligibility",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "isEligible"
+                ],
+                "properties": {
+                  "isEligible": {
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Student; assigning the current value is a no-op",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Student"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          },
+          "405": {
+            "description": "The HTTP method is not supported for this route."
+          }
+        }
+      }
+    },
+    "/api/v1/equipment/{id}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/id"
+        }
+      ],
+      "get": {
+        "operationId": "getEquipment",
+        "responses": {
+          "200": {
+            "description": "Equipment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Equipment"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          },
+          "405": {
+            "description": "The HTTP method is not supported for this route."
+          }
+        }
+      },
+      "put": {
+        "operationId": "updateEquipment",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/EquipmentInput"
+        },
+        "responses": {
+          "200": {
+            "description": "Updated equipment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Equipment"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          },
+          "405": {
+            "description": "The HTTP method is not supported for this route."
+          }
+        }
+      }
+    },
+    "/api/v1/borrowings": {
+      "get": {
+        "operationId": "listBorrowings",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "Active",
+                "Returned",
+                "All"
+              ],
+              "default": "All"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "borrowedDate",
+                "expectedReturnDate"
+              ],
+              "default": "borrowedDate"
+            }
+          },
+          {
+            "name": "direction",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "default": "asc"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Filtered borrowing array",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Borrowing"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          },
+          "405": {
+            "description": "The HTTP method is not supported for this route."
+          }
+        }
+      },
+      "post": {
+        "operationId": "createBorrowing",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "studentId",
+                  "equipmentId",
+                  "expectedReturnDate"
+                ],
+                "properties": {
+                  "studentId": {
+                    "type": "string"
+                  },
+                  "equipmentId": {
+                    "type": "string"
+                  },
+                  "expectedReturnDate": {
+                    "type": "string",
+                    "format": "date"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created borrowing",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Borrowing"
+                }
+              }
+            },
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          },
+          "405": {
+            "description": "The HTTP method is not supported for this route."
+          }
+        }
+      }
+    },
+    "/api/v1/checkout-requests": {
+      "post": {
+        "operationId": "createMultiItemCheckout",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "studentId",
+                  "equipmentIds",
+                  "expectedReturnDate"
+                ],
+                "properties": {
+                  "studentId": {
+                    "type": "string"
+                  },
+                  "equipmentIds": {
+                    "type": "array",
+                    "minItems": 2,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "expectedReturnDate": {
+                    "type": "string",
+                    "format": "date"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "All created borrowings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "borrowings"
+                  ],
+                  "properties": {
+                    "borrowings": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Borrowing"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          },
+          "405": {
+            "description": "The HTTP method is not supported for this route."
+          }
+        }
+      }
+    },
+    "/api/v1/borrowings/{id}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/id"
+        }
+      ],
+      "get": {
+        "operationId": "getBorrowing",
+        "responses": {
+          "200": {
+            "description": "Borrowing",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Borrowing"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          },
+          "405": {
+            "description": "The HTTP method is not supported for this route."
+          }
+        }
+      }
+    },
+    "/api/v1/borrowings/{id}/return": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/id"
+        }
+      ],
+      "post": {
+        "operationId": "returnBorrowing",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Returned borrowing",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Borrowing"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          },
+          "405": {
+            "description": "The HTTP method is not supported for this route."
+          }
+        }
+      }
+    },
+    "/api/v1/students/{id}/borrowings": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/id"
+        }
+      ],
+      "get": {
+        "operationId": "getStudentHistory",
+        "responses": {
+          "200": {
+            "description": "Student borrowing history, including active and returned records",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Borrowing"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          },
+          "405": {
+            "description": "The HTTP method is not supported for this route."
+          }
+        }
+      }
+    },
+    "/api/v1/equipment/{id}/borrowings": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/id"
+        }
+      ],
+      "get": {
+        "operationId": "getEquipmentHistory",
+        "responses": {
+          "200": {
+            "description": "Equipment borrowing history, including active and returned records",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Borrowing"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          },
+          "405": {
+            "description": "The HTTP method is not supported for this route."
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "id": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      }
+    },
+    "requestBodies": {
+      "StudentInput": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "studentNumber",
+                "fullName"
+              ],
+              "properties": {
+                "studentNumber": {
+                  "type": "string",
+                  "maxLength": 32
+                },
+                "fullName": {
+                  "type": "string",
+                  "maxLength": 120
+                },
+                "contact": {
+                  "type": "string",
+                  "nullable": true,
+                  "maxLength": 254
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        }
+      },
+      "EquipmentInput": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "equipmentCode",
+                "name"
+              ],
+              "properties": {
+                "equipmentCode": {
+                  "type": "string",
+                  "maxLength": 32
+                },
+                "name": {
+                  "type": "string",
+                  "maxLength": 120
+                },
+                "description": {
+                  "type": "string",
+                  "nullable": true,
+                  "maxLength": 500
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "Student": {
+        "type": "object",
+        "required": [
+          "id",
+          "studentNumber",
+          "fullName",
+          "isEligible"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "ST-01122",
+            "description": "New student IDs use the ST- prefix. Existing imported IDs are preserved."
+          },
+          "studentNumber": {
+            "type": "string",
+            "example": "2024302407"
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "contact": {
+            "type": "string",
+            "nullable": true
+          },
+          "isEligible": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Equipment": {
+        "type": "object",
+        "required": [
+          "id",
+          "equipmentCode",
+          "name",
+          "isAvailable"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "EQ-102",
+            "description": "New equipment IDs use the equipment code. Existing imported IDs are preserved."
+          },
+          "equipmentCode": {
+            "type": "string",
+            "example": "EQ-102"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "isAvailable": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Borrowing": {
+        "type": "object",
+        "required": [
+          "id",
+          "studentId",
+          "equipmentId",
+          "borrowedDate",
+          "expectedReturnDate",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "BR-00001",
+            "description": "New borrowing IDs use the BR- prefix. Existing imported IDs are preserved."
+          },
+          "studentId": {
+            "type": "string",
+            "example": "ST-01122"
+          },
+          "equipmentId": {
+            "type": "string",
+            "example": "EQ-102"
+          },
+          "borrowedDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "expectedReturnDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "returnedDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "Active",
+              "Returned"
+            ]
+          },
+          "studentNumber": {
+            "type": "string",
+            "example": "2024302407",
+            "nullable": true
+          },
+          "studentName": {
+            "type": "string",
+            "nullable": true
+          },
+          "equipmentCode": {
+            "type": "string",
+            "example": "EQ-102",
+            "nullable": true
+          },
+          "equipmentName": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "Invalid syntax or fields",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Resource not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "Conflict": {
+        "description": "Business rule or duplicate conflict",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "ServerError": {
+        "description": "Unexpected server failure; response contains no secrets or stack traces",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      }
+    }
+  }
+}

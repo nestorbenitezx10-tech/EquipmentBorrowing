@@ -1,0 +1,62 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:EquipmentBorrowing.Desktop.ViewModels"
+             x:Class="EquipmentBorrowing.Desktop.Views.StudentsView"
+             x:DataType="vm:StudentsViewModel">
+    <StackPanel Spacing="18">
+        <TextBlock Text="Student Roster and Eligibility" FontSize="18" FontWeight="Bold"/>
+
+        <Border Padding="14" CornerRadius="6" Background="#F4F7FA" BorderBrush="#D0D7DE" BorderThickness="1">
+            <StackPanel Spacing="10">
+                <TextBlock Text="Register or Edit Student" FontWeight="SemiBold"/>
+                <WrapPanel Orientation="Horizontal" ItemHeight="36">
+                    <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,14,8">
+                        <TextBlock Text="Student No." VerticalAlignment="Center"/>
+                        <TextBox Width="140" Watermark="e.g. STU-003" Text="{Binding StudentNumberInput}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,14,8">
+                        <TextBlock Text="Full Name" VerticalAlignment="Center"/>
+                        <TextBox Width="200" Watermark="Student full name" Text="{Binding FullNameInput}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,14,8">
+                        <TextBlock Text="Contact" VerticalAlignment="Center"/>
+                        <TextBox Width="180" Watermark="Optional email/phone" Text="{Binding ContactInput}"/>
+                    </StackPanel>
+                </WrapPanel>
+
+                <WrapPanel Orientation="Horizontal">
+                    <Button Content="Register Student" Command="{Binding RegisterStudentCommand}" Margin="0,0,8,6"/>
+                    <Button Content="Save Changes" Command="{Binding UpdateStudentCommand}" Margin="0,0,8,6"/>
+                    <Button Content="Permit Borrowing" Command="{Binding PermitStudentCommand}" Margin="0,0,8,6"/>
+                    <Button Content="Restrict Borrowing" Command="{Binding RestrictStudentCommand}" Margin="0,0,8,6"/>
+                    <Button Content="Clear Form" Command="{Binding ClearFormCommand}" Margin="0,0,8,6"/>
+                </WrapPanel>
+            </StackPanel>
+        </Border>
+
+        <StackPanel Spacing="6">
+            <TextBlock Text="Loading students..." IsVisible="{Binding IsLoading}" FontStyle="Italic"/>
+            <DataGrid Height="220"
+                      ItemsSource="{Binding Students}"
+                      SelectedItem="{Binding SelectedStudent}"
+                      AutoGenerateColumns="True"
+                      IsReadOnly="True"
+                      GridLinesVisibility="All"/>
+        </StackPanel>
+
+        <Border Padding="14" CornerRadius="6" Background="#F9FBFD" BorderBrush="#D0D7DE" BorderThickness="1">
+            <StackPanel Spacing="10">
+                <TextBlock Text="Selected Student Borrowing History" FontWeight="SemiBold"/>
+                <TextBlock Text="Loading borrowing history..." IsVisible="{Binding IsHistoryLoading}" FontStyle="Italic"/>
+                <TextBlock Text="{Binding HistoryStatusMessage}"
+                           IsVisible="{Binding HistoryStatusMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                           TextWrapping="Wrap"/>
+                <DataGrid Height="180"
+                          ItemsSource="{Binding SelectedStudentHistory}"
+                          AutoGenerateColumns="True"
+                          IsReadOnly="True"
+                          GridLinesVisibility="All"/>
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</UserControl>

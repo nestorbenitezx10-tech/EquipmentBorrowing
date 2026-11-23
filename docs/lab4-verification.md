@@ -1,80 +1,81 @@
 # Laboratory Activity 4 — verification record
 
-Use a disposable PostgreSQL database for deliberate failure/constraint tests.
-For each acceptance scenario, record setup, action, expected result, observed
-result, and evidence. A screenshot alone does not establish persistence,
-atomicity, or architecture. Verify database state through a fresh connection
-after each write.
+Contributor attribution supplied for this submission: **NESTOR S. BENITEZ**
+(Student ID `2024302407`). The supplied names identify the same person, so the
+contributor is listed once. No cover sheet or role template is present in the
+retained project.
+
+The retained application uses SQLite. Run the commands from the repository
+root; do not treat evidence from the earlier PostgreSQL copy as verification
+of this SQLite implementation.
 
 ## Reproducible checks
 
-From the solution directory:
-
 ```powershell
-dotnet build src\EquipmentBorrowing.Desktop\EquipmentBorrowing.Desktop.csproj
-dotnet test tests\EquipmentBorrowing.Tests\EquipmentBorrowing.Tests.csproj
-dotnet run --project src\EquipmentBorrowing.Desktop\EquipmentBorrowing.Desktop.csproj
+dotnet build --configuration Release
+dotnet test
+dotnet run --project EquipmentBorrowing\src\EquipmentBorrowing.Desktop\EquipmentBorrowing.Desktop.csproj
 ```
 
-The current automated tests cover valid single checkout, multi-item minimum,
-duplicate and date validation, single-operation delegation, and combined
-case-insensitive borrowing search/status/sort. They do not replace the live
-PostgreSQL acceptance scenarios below.
+`dotnet test` runs the root solution, which includes the retained projects and
+test project under `EquipmentBorrowing\`. The current automated suite contains
+two legacy borrowing-service tests and one SQLite migration/integrity test.
+It is not a full automated implementation of A01–A19.
 
-## Workspace run recorded
+Final verification on 2026-11-21: the root-solution Release build succeeded;
+`dotnet test` passed 3 tests with 0 failures. Restore still reports NU1903
+high-severity vulnerability warnings for `Microsoft.Extensions.Caching.Memory`
+8.0.0 and `SQLitePCLRaw.lib.e_sqlite3` 2.1.6.
 
-- Desktop build: passed with no warnings.
-- `dotnet test EquipmentBorrowing\EquipmentBorrowing.slnx`: 6 passed, 0 failed.
-- Desktop launch: the `Campus Equipment Borrowing` window opened. Startup
-  completed migration/initialization and displayed the three catalog seed
-  items (`EQ-101`–`EQ-103`).
-- A follow-up manual run used the user-confirmed disposable test database.
-  The results below are observed in the application; screenshots and direct
-  SQL snapshots were not saved.
-- The final checkout-form layout adjustment was rebuilt and the app reopened;
-  the student selector, date picker, and borrow button are visible after the
-  catalog without scrolling to the bottom of the view.
+## Acceptance evidence matrix
 
-## Acceptance evidence checklist
+Status definitions: **Partial** means some but not all required checks have
+evidence; **Not tested** means no current SQLite evidence was recorded;
+**Deferred** means outside this activity's scope.
 
-| Evidence | Scenario / expected state | Observed result and evidence to attach |
+| ID / use case | Acceptance focus | Current status and evidence |
 |---|---|---|
-| A01 / UC-01 | Catalog reflects PostgreSQL; empty and connection-error states are distinct | App displayed EQ-101–EQ-103 at startup; direct DB comparison and empty/error states not captured |
-| A02 / UC-02 | Available-only excludes unavailable items; no-match/error states differ | Multi-checkout list showed only EQ-103 available after EQ-101/EQ-102 were checked out; catalog's Available only button and no-match/error states not captured |
-| A03 / UC-03 | Valid single issue creates one active row and unavailable item; invalid/ineligible/missing/over-limit/date requests write nothing | Not tested |
-| A04 / UC-04 | Active list includes related student/equipment and excludes returned rows | Active list showed two STU-001 records for EQ-101/EQ-102; EQ-101 disappeared from active list after return |
-| A05 / UC-05 | Same row is returned with actual date, item available; repeat/stale return does not change data | EQ-101 returned; status/date and subsequent item/student history showed Returned. Repeat/stale return not tested |
-| A06 / UC-06 | Two selected items commit together; each rejection and a post-write controlled failure leaves no partial change | STU-001 checked out EQ-101 and EQ-102 together; two active rows appeared. Rejection/controlled-failure rollback not tested; EQ-102 remains active in the test DB |
-| A07 / UC-07 | Student histories contain only the selected student's active/returned rows; empty/error differ | STU-001 history showed EQ-101 Returned and EQ-102 Active; other-student, empty/error cases not tested |
-| A08 / UC-08 | Equipment histories contain only the selected item's active/returned rows; empty/error differ | EQ-101 history showed STU-001 and its Returned record; other-item, empty/error cases not tested |
-| A09 / UC-09 | Search each field, all status values, both sort fields/directions, combine/reset, no-match/error | Partial search `Nicolette` returned matching rows; Active and Returned filters worked. Expected-return sort was selected; remaining combinations/directions/reset/no-match/error not tested |
-| A12 / UC-12 | Registration persists eligible student; blank and case/whitespace duplicate values rejected | Registered QA-STU-20261121-0115; lower-case/space-padded duplicate was rejected. Blank-field case not tested |
-| A13 / UC-13 | Edit same student identity with history; clear contact; reject blank/duplicate edits | Updated QA student number/name and cleared contact; row remained after app restart. History preservation and invalid edit cases not tested |
-| A14 / UC-14 | Restriction blocks new issue but permits return of active loan; permission restores checkout | QA test student was restricted successfully; checkout rejection, existing-loan return while restricted, and re-permit not tested |
-| A15 / UC-15 | Registration persists available item; blank and normalized duplicate rejected | Registered QA-EQ-20261121-0115; lower-case/space-padded duplicate was rejected. Blank-field case not tested |
-| A16 / UC-16 | Descriptive edit preserves identity, availability, and history; blank/duplicate fields rejected | Updated QA item name and cleared description; it remained available after app restart. History preservation and other invalid edits not tested |
-| A17 / Cross-cutting | Clean migration creates keys, foreign keys, checks, unique and partial active-loan index | Startup migration completed; direct `__EFMigrationsHistory` and schema/index inspection not captured |
-| A18 / Cross-cutting | Safe failure has clear feedback, no false success/partial known-failure change; retry works after recovery | Not captured yet |
-| A19 / Submission | Diagram, suite, matrix, README, source, migration and Git history agree | Source/docs present; inspect Git history at submission and add partner identities |
+| A01 / UC-01 | SQLite catalog; empty and connection-error states differ | **Partial.** The current desktop screenshot displayed EQ-101–EQ-103. Direct database comparison and empty/error states were not captured. |
+| A02 / UC-02 | Available-only excludes unavailable items; no-match/error differ | **Not tested.** Earlier observations were from the PostgreSQL copy; this filter and its empty/error cases need revalidation on SQLite. |
+| A03 / UC-03 | Valid single issue; rejected requests write nothing | **Not tested.** Current UI checkout behavior has not been exercised against SQLite. |
+| A04 / UC-04 | Active list includes related rows and excludes returned rows | **Not retested.** The earlier PostgreSQL observations are not evidence for the retained SQLite project. |
+| A05 / UC-05 | Same row returned with actual date; repeat/stale return is safe | **Not retested.** Earlier PostgreSQL observations are not evidence for the retained SQLite project. |
+| A06 / UC-06 | Multi-item checkout is atomic; rejections do not partially write | **Not tested.** The current controlled-failure rollback path and rejection cases need verification. |
+| A07 / UC-07 | Only selected student's history; empty/error states differ | **Not retested** on SQLite. |
+| A08 / UC-08 | Only selected equipment's history; empty/error states differ | **Not retested** on SQLite. |
+| A09 / UC-09 | Search, status, sort directions, combine/reset, no-match/error | **Not retested** on SQLite. |
+| A10 / UC-10 | View overdue borrowings | **Deferred** to Laboratory Activity 5. |
+| A11 / UC-11 | View current equipment holder | **Deferred** to Laboratory Activity 5. |
+| A12 / UC-12 | Register eligible student; reject blank/normalized duplicate values | **Not retested** on SQLite. |
+| A13 / UC-13 | Edit student without losing identity/history; reject invalid edits | **Not retested** on SQLite. |
+| A14 / UC-14 | Restriction blocks new issue but permits return; permission restores checkout | **Not retested** on SQLite. |
+| A15 / UC-15 | Register available item; reject blank/normalized duplicates | **Not retested** on SQLite. |
+| A16 / UC-16 | Descriptive item edit preserves identity, availability, and history | **Not retested** on SQLite. |
+| A17 / UC-17 | Migration creates current schema and integrity rules | **Automated partial; passed.** `MigrationTests.Upgrade_PreservesLegacyRecordsAndMapsCurrentSchema` upgrades a temporary legacy SQLite database, verifies data/date/status conversion, and exercises foreign keys, checks, unique normalized identifiers, and the partial active-loan index. A separate inspection of the app database's `__EFMigrationsHistory` was not captured. |
+| A18 / UC-18 | Safe failure, no partial write, useful feedback, and retry | **Not tested.** The controlled-failure/recovery walkthrough has not been run on the retained SQLite app. |
+| A19 / UC-19 | README, diagram, matrix, tests, source, migrations, and history agree | **In progress.** Documentation and the root solution are aligned to SQLite; Git status/history inspection and commit are pending. |
 
-For A06, enable `Testing:FailBeforeCommit` only when connecting to
-`campus_equipment_test`. The configured fault injector throws after writes are
-sent but before transaction commit. Compare before/after state using a fresh
-database connection; never enable it against a shared or production database.
+## Schema and architecture checks
 
-For A17, inspect `__EFMigrationsHistory` and the constraints/indexes described
-in [database-schema.md](database-schema.md). For A18, disconnect only while
-using disposable data or a controlled test seam. A failure during commit can
-be an unknown outcome; reconnect and inspect before deciding whether to retry.
+- Physical table names are `Students`, `Equipment`, and `Borrowings`; the
+  diagram and rules are in [database-schema.md](database-schema.md).
+- The retained migration sequence is
+  `20261004084854_InitialCreate` then
+  `20261121022649_AlignActivity4Schema`. PostgreSQL migrations
+  `20261120145548_InitialPostgresCreate` and
+  `20261120165014_EnforceIdentifierIntegrity` are not in the retained SQLite
+  source tree.
+- Unique normalized student/equipment identifiers, restrictive foreign keys,
+  borrowing date/status checks, and the partial unique active-equipment index
+  are defined by the SQLite model and migrations. The student limit of three
+  active loans is checked in checkout logic, not by a database constraint.
+- Views bind to ViewModels. ViewModels call application services; services use
+  repository interfaces; EF Core repositories persist to SQLite.
+- Multi-item checkout performs validation and writes in a serializable SQLite
+  transaction. No `Testing:FailBeforeCommit` configuration is present in this
+  retained source; do not claim a controlled-failure test until that seam is
+  implemented and exercised.
 
-## Architecture checks
-
-- The Avalonia Views bind to ViewModels and do not contain SQL or configure
-  connections.
-- ViewModels call application services; services call repository abstractions.
-- EF repositories create/dispose a short-lived context per operation from
-  `IDbContextFactory`.
-- Multi-item checkout revalidates inside a serializable transaction; PostgreSQL
-  constraints provide the final concurrency protection.
-- Borrowing history remains linked through student/equipment edits and returns;
-  hard deletion is not part of this activity.
+The A01–A19 statuses above are evidence statuses, not claims that every
+acceptance scenario has passed. Attach direct database and UI evidence as each
+remaining scenario is verified.

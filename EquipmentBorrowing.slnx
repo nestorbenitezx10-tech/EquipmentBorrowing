@@ -1,12 +1,13 @@
 <Solution>
-  <Folder Name="/src/">
-    <Project Path="src/EquipmentBorrowing.Application/EquipmentBorrowing.Application.csproj" />
-    <Project Path="src/EquipmentBorrowing.Demo/EquipmentBorrowing.Demo.csproj" />
-    <Project Path="src/EquipmentBorrowing.Desktop/EquipmentBorrowing.Desktop.csproj" />
-    <Project Path="src/EquipmentBorrowing.Domain/EquipmentBorrowing.Domain.csproj" />
-    <Project Path="src/EquipmentBorrowing.Infrastructure/EquipmentBorrowing.Infrastructure.csproj" />
+  <Folder Name="/EquipmentBorrowing/src/">
+    <Project Path="EquipmentBorrowing/src/EquipmentBorrowing.Application/EquipmentBorrowing.Application.csproj" />
+    <Project Path="EquipmentBorrowing/src/EquipmentBorrowing.Api/EquipmentBorrowing.Api.csproj" />
+    <Project Path="EquipmentBorrowing/src/EquipmentBorrowing.Demo/EquipmentBorrowing.Demo.csproj" />
+    <Project Path="EquipmentBorrowing/src/EquipmentBorrowing.Desktop/EquipmentBorrowing.Desktop.csproj" />
+    <Project Path="EquipmentBorrowing/src/EquipmentBorrowing.Domain/EquipmentBorrowing.Domain.csproj" />
+    <Project Path="EquipmentBorrowing/src/EquipmentBorrowing.Infrastructure/EquipmentBorrowing.Infrastructure.csproj" />
   </Folder>
-  <Folder Name="/tests/">
-    <Project Path="tests/EquipmentBorrowing.Tests/EquipmentBorrowing.Tests.csproj" />
+  <Folder Name="/EquipmentBorrowing/tests/">
+    <Project Path="EquipmentBorrowing/tests/EquipmentBorrowing.Tests/EquipmentBorrowing.Tests.csproj" />
   </Folder>
 </Solution>

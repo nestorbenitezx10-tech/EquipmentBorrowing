@@ -1,0 +1,80 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:EquipmentBorrowing.Desktop.ViewModels"
+             x:Class="EquipmentBorrowing.Desktop.Views.EquipmentView"
+             x:DataType="vm:EquipmentViewModel">
+    <StackPanel Spacing="18">
+        <StackPanel Orientation="Horizontal" Spacing="20">
+            <TextBlock Text="Campus Equipment Inventory" FontSize="18" FontWeight="Bold" VerticalAlignment="Center"/>
+            <CheckBox Content="Available Only" IsChecked="{Binding ShowAvailableOnly}" VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <Border Padding="14" CornerRadius="6" Background="#F4F7FA" BorderBrush="#D0D7DE" BorderThickness="1">
+            <StackPanel Spacing="10">
+                <TextBlock Text="Register or Edit Equipment Details" FontWeight="SemiBold"/>
+                <WrapPanel Orientation="Horizontal">
+                    <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,14,8">
+                        <TextBlock Text="Identifier" VerticalAlignment="Center"/>
+                        <TextBox Width="130" Watermark="e.g. EQ-104" Text="{Binding IdentifierInput}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,14,8">
+                        <TextBlock Text="Name" VerticalAlignment="Center"/>
+                        <TextBox Width="190" Watermark="Equipment name" Text="{Binding NameInput}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,14,8">
+                        <TextBlock Text="Description" VerticalAlignment="Center"/>
+                        <TextBox Width="220" Watermark="Optional notes" Text="{Binding DescriptionInput}"/>
+                    </StackPanel>
+                </WrapPanel>
+
+                <WrapPanel Orientation="Horizontal">
+                    <Button Content="Register Equipment" Command="{Binding RegisterEquipmentCommand}" Margin="0,0,8,6"/>
+                    <Button Content="Save Details" Command="{Binding UpdateEquipmentCommand}" Margin="0,0,8,6"/>
+                    <Button Content="Clear Form" Command="{Binding ClearFormCommand}" Margin="0,0,8,6"/>
+                </WrapPanel>
+            </StackPanel>
+        </Border>
+
+        <Border Padding="14" CornerRadius="6" Background="#F9FBFD" BorderBrush="#D0D7DE" BorderThickness="1">
+            <StackPanel Spacing="10">
+                <TextBlock Text="Quick Single-Item Checkout" FontWeight="SemiBold"/>
+                <WrapPanel Orientation="Horizontal">
+                    <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,14,6">
+                        <TextBlock Text="Student ID" VerticalAlignment="Center"/>
+                        <TextBox Width="150" Text="{Binding StudentIdInput}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,14,6">
+                        <TextBlock Text="Borrowing Days" VerticalAlignment="Center"/>
+                        <NumericUpDown Width="100" Minimum="1" Maximum="365" Value="{Binding BorrowingDays}"/>
+                    </StackPanel>
+                    <Button Content="Borrow Selected Equipment" Command="{Binding BorrowSelectedEquipmentCommand}" Margin="0,0,8,6"/>
+                </WrapPanel>
+            </StackPanel>
+        </Border>
+
+        <StackPanel Spacing="6">
+            <TextBlock Text="Loading equipment..." IsVisible="{Binding IsLoading}" FontStyle="Italic"/>
+            <DataGrid Height="220"
+                      ItemsSource="{Binding EquipmentList}"
+                      SelectedItem="{Binding SelectedEquipment}"
+                      AutoGenerateColumns="True"
+                      IsReadOnly="True"
+                      GridLinesVisibility="All"/>
+        </StackPanel>
+
+        <Border Padding="14" CornerRadius="6" Background="#F9FBFD" BorderBrush="#D0D7DE" BorderThickness="1">
+            <StackPanel Spacing="10">
+                <TextBlock Text="Selected Equipment Borrowing History" FontWeight="SemiBold"/>
+                <TextBlock Text="Loading equipment history..." IsVisible="{Binding IsHistoryLoading}" FontStyle="Italic"/>
+                <TextBlock Text="{Binding HistoryStatusMessage}"
+                           IsVisible="{Binding HistoryStatusMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                           TextWrapping="Wrap"/>
+                <DataGrid Height="180"
+                          ItemsSource="{Binding SelectedEquipmentHistory}"
+                          AutoGenerateColumns="True"
+                          IsReadOnly="True"
+                          GridLinesVisibility="All"/>
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</UserControl>
