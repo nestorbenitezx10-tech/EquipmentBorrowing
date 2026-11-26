@@ -1,91 +1,99 @@
 # Campus Equipment Borrowing System
 
-ITSD 81 — Desktop Application Development
+**Course:** ITSD 81 — Desktop Application Development  
+**Project:** Campus Equipment Borrowing System  
+**Contributor:** NESTOR S. BENITEZ — Student ID `2024302407`
 
-An Avalonia desktop application for managing students, equipment, borrowing
-requests, and returns. The Activity 4 baseline used Entity Framework Core with
-SQLite. Activity 5 adds an ASP.NET Core API backed by PostgreSQL; the desktop
-now accesses application data through HTTP.
+This repository documents the project’s development from Laboratory Activity 1 through Laboratory Activity 5. It grows from a layered borrowing workflow into an Avalonia desktop application, adds database persistence and expanded equipment desk workflows, then connects the desktop client to a PostgreSQL-backed API. The activity descriptions below are specific to this repository; later activities may differ from examples in other students’ projects.
 
-## Contributor
+## Project progression
 
-- NESTOR S. BENITEZ — Student ID: 2024302407
+### Laboratory Activity 1 — Application structure and domain
 
-## Active project location
+Established the borrowing system’s layered foundation: Domain, Application, Infrastructure, tests, and a console demonstration. The activity modeled students, equipment, and borrowings; defined repository interfaces and application services; and kept business rules independent of storage and user-interface technologies.
 
-The active Activity 4 projects, Activity 5 API, and tests are in the
-`EquipmentBorrowing\` subdirectory and are included in the repository-root
-solution:
+The intended dependency direction is inward: Application depends on Domain; Infrastructure implements Application’s repository interfaces; and the demonstration and tests use those layers. The initial repositories use in-memory collections.
 
-- `EquipmentBorrowing\src\EquipmentBorrowing.Domain`
-- `EquipmentBorrowing\src\EquipmentBorrowing.Application`
-- `EquipmentBorrowing\src\EquipmentBorrowing.Infrastructure`
-- `EquipmentBorrowing\src\EquipmentBorrowing.Desktop`
-- `EquipmentBorrowing\tests\EquipmentBorrowing.Tests`
+### Laboratory Activity 2 — Avalonia UI and MVVM
+
+Added an Avalonia desktop interface using Views, ViewModels, bindings, and commands. The UI calls application services for borrowing and returning equipment, while dependency setup is centralized in the application startup code.
+
+The Views handle presentation, ViewModels expose screen state and commands, and application services coordinate borrowing rules. This keeps UI controls out of the domain and application layers.
+
+### Laboratory Activity 3 — SQLite and Entity Framework Core
+
+Replaced the in-memory repositories with Entity Framework Core and SQLite persistence. The domain and application layers continue to use repository abstractions, while the Infrastructure layer handles database access and migrations.
+
+The database stores students, equipment, and borrowing records with relationships and integrity rules. Repository implementations translate application requests into EF Core queries and updates; the UI does not query the database directly.
+
+### Laboratory Activity 4 — Equipment desk workflows
+
+Expanded the desktop application with equipment and student management, eligibility controls, single and multi-item checkout, returns, borrowing histories, and borrowing search/filter/sort. This activity’s retained application uses SQLite. Use cases, schema notes, screenshots, and verification status are available in:
+
+- [Lab 4 use cases](docs/lab4-use-cases.md)
+- [Lab 4 verification record](docs/lab4-verification.md)
+- [Lab 4 screenshots](docs/screenshots/New%20folder/)
+
+The verification record distinguishes checks with evidence from items that still need retesting. It should be used as the source of truth for Lab 4 acceptance status.
+
+### Laboratory Activity 5 — PostgreSQL API integration
+
+Added an ASP.NET Core API backed by PostgreSQL and connected the Avalonia desktop client through HTTP. The API provides versioned endpoints for equipment, students, and borrowings; the desktop uses HTTP repositories and does not connect directly to the database. The API applies its PostgreSQL schema at startup.
+
+Lab 5 extends the Lab 4 workflows through an API boundary. The API and desktop can be started separately, and the traceability and acceptance documents describe endpoint coverage and observed test status.
+
+- [Lab 5 API traceability](docs/lab5-traceability.md)
+- [Lab 5 acceptance record](docs/lab5-acceptance-record.md)
+- [Lab 5 screenshots](docs/screenshots/lab5/)
+
+## Current architecture
+
+```text
+Avalonia Views → ViewModels → HTTP repositories → ASP.NET Core API
+                                                  → Application services
+                                                  → EF Core → PostgreSQL
+```
+
+The repository also retains the SQLite-based desktop and Infrastructure implementation used for Lab 4. The Lab 5 API is a separate host; its desktop client communicates with it over HTTP.
 
 ## Requirements
 
-- .NET 8 SDK/runtime for the active desktop and API projects
-- PostgreSQL for the Activity 5 API
+- .NET 8 SDK/runtime
+- PostgreSQL for the Lab 5 API
 
-## Record ID format
+## Build and run
 
-New PostgreSQL records use readable primary IDs: students use `ST-01122`-style
-IDs, equipment uses its equipment code (for example `EQ-102`), and borrowings
-use `BR-00001`-style IDs. The student's school number remains a separate value,
-such as `2024302407`. Existing records keep their original IDs so borrowing
-history and foreign-key links remain intact.
-
-## Build, test, and run
-
-Run these commands from the repository root:
+Run commands from the repository root. To restore and build the solution:
 
 ```powershell
-& "$env:ProgramFiles\dotnet\dotnet.exe" restore
-& "$env:ProgramFiles\dotnet\dotnet.exe" build EquipmentBorrowing\src\EquipmentBorrowing.Api\EquipmentBorrowing.Api.csproj
+dotnet restore
+dotnet build EquipmentBorrowing.slnx
 ```
 
-The Activity 4 SQLite migration files remain in the retained infrastructure
-project. The API applies the PostgreSQL baseline in
-`EquipmentBorrowing\src\EquipmentBorrowing.Api\Migrations` at startup.
-
-## Verification scope
-
-The current automated suite covers two legacy borrowing-service cases and a
-SQLite migration test that verifies data conversion and database integrity
-constraints. It is not a full automated implementation of A01–A19. The
-scenario-by-scenario status, including manual evidence and untested cases, is
-maintained in [docs/lab4-verification.md](docs/lab4-verification.md).
-
-## Architecture
-
-```text
-Avalonia View → ViewModel → HTTP client → ASP.NET Core API
-                                  → application services → EF Core → PostgreSQL
-```
-
-The Domain project contains the borrowing model and rules. The API owns
-business coordination and PostgreSQL persistence. Avalonia uses asynchronous
-HTTP repositories and does not open a database connection.
-
-## Laboratory Activity 5 API
-
-The Activity 5 API host is `EquipmentBorrowing\src\EquipmentBorrowing.Api`. It serves the versioned endpoints independently of the desktop and publishes its OpenAPI document at `http://localhost:5090/openapi/v1.json`. The desktop reads `EQUIPMENTBORROWING_API_URL` (default `http://localhost:5090/`) and uses HTTP repositories; it does not open the database.
-
-Use PostgreSQL for Activity 5. Create a **new disposable database** in pgAdmin for acceptance work; do not run the reset script against the existing `campus_equipment` database. From the repository root, start the API with the secure password prompt:
+To run the SQLite desktop application:
 
 ```powershell
-& .\scripts\start-api.ps1
+dotnet run --project src/EquipmentBorrowing.Desktop/EquipmentBorrowing.Desktop.csproj
 ```
 
-For the T08 reachable-server/database-error check only, stop the normal API and start the controlled missing-database scenario with `& .\scripts\start-api.ps1 -SimulateT08DatabaseError`. It uses a deliberately nonexistent database name; run the normal command again afterward to restore the application.
-
-The API applies the idempotent PostgreSQL baseline script at startup. In a second terminal, start the desktop against the same port:
+To run the Lab 5 PostgreSQL API and desktop client, use the included scripts:
 
 ```powershell
-& .\scripts\start-desktop.ps1
+.\scripts\start-api.ps1
 ```
 
-To reset the controlled T01–T08 data, open `scripts\lab5-reset-disposable.sql` in pgAdmin and run it only against the dedicated disposable Activity 5 database. It deletes the application rows before inserting the test dataset.
+In a second terminal:
 
-Implementation mapping is in [docs/lab5-traceability.md](docs/lab5-traceability.md). See [docs/lab5-acceptance-record.md](docs/lab5-acceptance-record.md) for execution evidence: T01–T06 are recorded as passing; T07 data loading is verified but live refresh remains pending, and T08 still needs desktop error/recovery verification.
+```powershell
+.\scripts\start-desktop.ps1
+```
+
+The API defaults to `http://localhost:5090/`. It reads its PostgreSQL connection settings from the environment and prompts securely for the database password when started with the script. For disposable Lab 5 acceptance data and the controlled database reset procedure, see the [Lab 5 acceptance record](docs/lab5-acceptance-record.md) before running any SQL scripts.
+
+## Record IDs
+
+In the Lab 5 PostgreSQL API, new student records use IDs such as `ST-01122`, equipment uses its equipment code such as `EQ-102`, and borrowings use IDs such as `BR-00001`. A student’s school number remains a separate value. Existing IDs are preserved so borrowing history and foreign-key links remain intact.
+
+## Screenshots
+
+Browse the [Lab 4 desktop screenshots](docs/screenshots/New%20folder/) and [Lab 5 API screenshots](docs/screenshots/lab5/). Additional screenshots from the project folder are in [docs/screenshots](docs/screenshots/).
